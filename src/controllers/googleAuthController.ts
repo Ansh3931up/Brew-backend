@@ -50,3 +50,8 @@ export const googleAuthInitiate = (_req: Request, res: Response): Response => {
     HTTP_STATUS.NOT_IMPLEMENTED
   )
 }
+
+export const googleAuthStatus = (_req: Request, res: Response): Response => {
+  const isEnabled = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)
+  return res.status(HTTP_STATUS.OK).json({ enabled: isEnabled })
+}

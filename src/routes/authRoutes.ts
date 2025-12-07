@@ -3,7 +3,8 @@ import { register, login, getCurrentUser, logout } from '../controllers/authCont
 import {
   googleAuth,
   googleCallback,
-  googleAuthInitiate
+  googleAuthInitiate,
+  googleAuthStatus
 } from '../controllers/googleAuthController.js'
 import { registerValidation, loginValidation } from '../middleware/authValidation.js'
 import { authenticate } from '../middleware/auth.js'
@@ -15,6 +16,9 @@ const router = Router()
 // Public routes with rate limiting (only on signup/login)
 router.post('/register', authRateLimitMiddleware, registerValidation, register)
 router.post('/login', authRateLimitMiddleware, loginValidation, login)
+
+// Google OAuth status endpoint (public)
+router.get('/google/status', googleAuthStatus)
 
 // Google OAuth routes
 if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
