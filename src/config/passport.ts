@@ -71,8 +71,8 @@ if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
 }
 
 // Serialize user for session (not used with JWT, but required by Passport)
-passport.serializeUser((user: IUser, done) => {
-  done(null, user._id)
+passport.serializeUser((user: unknown, done) => {
+  done(null, (user as IUser)._id)
 })
 
 passport.deserializeUser(async (id: string, done) => {

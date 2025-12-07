@@ -113,8 +113,8 @@ export const sendFriendRequest = async (
     await friendRequest.populate('requesterId', 'name email')
     await friendRequest.populate('recipientId', 'name email')
 
-    const requester = friendRequest.requesterId as IUser
-    const recipientPopulated = friendRequest.recipientId as IUser
+    const requester = friendRequest.requesterId as unknown as IUser
+    const recipientPopulated = friendRequest.recipientId as unknown as IUser
 
     return sendSuccess(
       res,
@@ -179,8 +179,8 @@ export const getFriendRequests = async (
       .sort({ createdAt: -1 })
 
     const formattedRequests = requests.map((req) => {
-      const requester = req.requesterId as IUser
-      const recipient = req.recipientId as IUser
+      const requester = req.requesterId as unknown as IUser
+      const recipient = req.recipientId as unknown as IUser
       return {
         id: req._id.toString(),
         requester: {
@@ -239,8 +239,8 @@ export const acceptFriendRequest = async (
     await friendRequest.populate('requesterId', 'name email')
     await friendRequest.populate('recipientId', 'name email')
 
-    const requester = friendRequest.requesterId as IUser
-    const recipientUser = friendRequest.recipientId as IUser
+    const requester = friendRequest.requesterId as unknown as IUser
+    const recipientUser = friendRequest.recipientId as unknown as IUser
 
     return sendSuccess(
       res,
@@ -318,8 +318,8 @@ export const getFriends = async (req: Request, res: Response): Promise<Response>
       .sort({ updatedAt: -1 })
 
     const friends = friendRelations.map((fr) => {
-      const requester = fr.requesterId as IUser
-      const recipient = fr.recipientId as IUser
+      const requester = fr.requesterId as unknown as IUser
+      const recipient = fr.recipientId as unknown as IUser
       const friend =
         requester._id.toString() === userId?.toString() ? recipient : requester
 
