@@ -1,6 +1,7 @@
-import { Response } from 'express';
-import { HTTP_STATUS } from '../config/constants.js';
-import { ApiResponse } from '../types/api.js';
+import { Response } from 'express'
+import { HTTP_STATUS } from './constants.js'
+import { ApiResponse } from './ApiResponse.js'
+import { ApiError } from './ApiError.js'
 
 export const sendSuccess = <T>(
   res: Response,
@@ -8,24 +9,22 @@ export const sendSuccess = <T>(
   message?: string,
   statusCode: number = HTTP_STATUS.OK
 ): Response => {
-  const response: ApiResponse<T> = {
-    success: true,
-    data,
-    ...(message && { message }),
-  };
-  return res.status(statusCode).json(response);
-};
+  const response = ApiResponse.success(data, message)
+  return res.status(statusCode).json(response.toJSON())
+}
 
 export const sendError = (
   res: Response,
   message: string,
   statusCode: number = HTTP_STATUS.INTERNAL_SERVER_ERROR,
+  code?: string,
   errors?: Record<string, string[]>
 ): Response => {
-  const response: ApiResponse = {
-    success: false,
-    error: message,
-    ...(errors && { errors }),
-  };
-  return res.status(statusCode).json(response);
-};
+  const response = ApiResponse.error(message, code, errors)
+  return res.status(statusCode).json(response.toJSON())
+}
+
+export const sendApiError = (res: Response, error: ApiError): Response => {
+  const response = ApiResponse.error(error.message, error.code, error.errors)
+  return res.status(error.statusCode).json(response.toJSON())
+}

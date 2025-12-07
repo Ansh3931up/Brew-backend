@@ -1,0 +1,3 @@
+jest.config.ts
+*.config.ts
+*.config.js

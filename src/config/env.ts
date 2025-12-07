@@ -1,8 +1,14 @@
-import { z } from 'zod';
-import dotenv from 'dotenv';
+import { z } from 'zod'
+import dotenv from 'dotenv'
+import crypto from 'crypto'
 
 // Load environment variables
-dotenv.config();
+dotenv.config()
+
+// Generate a random JWT secret (64 characters for security)
+const generateRandomJWTSecret = (): string => {
+  return crypto.randomBytes(32).toString('hex')
+}
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
@@ -13,35 +19,50 @@ const envSchema = z.object({
   JWT_SECRET: z
     .string()
     .min(32, 'JWT_SECRET must be at least 32 characters')
-    .default('development-secret-key-change-in-production-min-32-chars'),
+    .default(generateRandomJWTSecret()),
   JWT_EXPIRES_IN: z.string().default('7d'),
-});
+  DATABASE_URL: z.string().default('mongodb://localhost:27017/task-tracker'),
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  GOOGLE_CALLBACK_URL: z
+    .string()
+    .default('http://localhost:3001/api/auth/google/callback')
+})
 
-export type Env = z.infer<typeof envSchema>;
+export type Env = z.infer<typeof envSchema>
 
-let env: Env;
+let env: Env
 
 try {
-  env = envSchema.parse(process.env);
-  
-  // Warn if using default JWT_SECRET in production
-  if (
-    env.NODE_ENV === 'production' &&
-    env.JWT_SECRET === 'development-secret-key-change-in-production-min-32-chars'
-  ) {
+  // Check if JWT_SECRET is provided, if not use random generated one
+  const jwtSecretProvided = !!process.env.JWT_SECRET
+  env = envSchema.parse(process.env)
+
+  // Warn if using auto-generated JWT_SECRET in production
+  if (env.NODE_ENV === 'production' && !jwtSecretProvided) {
     console.warn(
-      '⚠️  WARNING: Using default JWT_SECRET in production! Set a secure JWT_SECRET in your environment variables.'
-    );
+      '⚠️  WARNING: Using auto-generated JWT_SECRET in production! Set a secure JWT_SECRET in your environment variables.'
+    )
+    console.warn(
+      '⚠️  Note: Auto-generated secrets change on each server restart, invalidating all existing tokens.'
+    )
+  }
+
+  // Log in development if using auto-generated secret
+  if (env.NODE_ENV === 'development' && !jwtSecretProvided) {
+    console.log(
+      'ℹ️  Using auto-generated JWT_SECRET for development. Set JWT_SECRET in .env for production.'
+    )
   }
 } catch (error) {
   if (error instanceof z.ZodError) {
-    console.error('❌ Invalid environment variables:');
+    console.error('❌ Invalid environment variables:')
     error.errors.forEach((err) => {
-      console.error(`  - ${err.path.join('.')}: ${err.message}`);
-    });
-    process.exit(1);
+      console.error(`  - ${err.path.join('.')}: ${err.message}`)
+    })
+    process.exit(1)
   }
-  throw error;
+  throw error
 }
 
-export default env;
+export default env

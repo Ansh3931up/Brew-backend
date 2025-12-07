@@ -1,15 +1,18 @@
-import { Request } from 'express';
+import type { IUser } from '../models/User.js'
+
+declare module 'express-session' {
+  interface SessionData {
+    userId?: string
+    userEmail?: string
+  }
+}
 
 declare global {
   namespace Express {
     interface Request {
-      user?: {
-        id: string;
-        email: string;
-        role: string;
-      };
+      user?: IUser
     }
   }
 }
 
-export {};
+export {}
