@@ -106,7 +106,8 @@ export const getAssignedTasks = async (
         status: task.status,
         flagged: task.flagged || false,
         assignedBy: task.assignedBy?._id.toString(),
-        assignedByEmail: task.assignedByEmail || (task.assignedBy as IUser)?.email,
+        assignedByEmail:
+          task.assignedByEmail || (task.assignedBy as unknown as IUser)?.email,
         createdAt: task.createdAt.toISOString(),
         updatedAt: task.updatedAt.toISOString()
       })),
@@ -669,7 +670,8 @@ export const searchAllTasks = async (req: Request, res: Response): Promise<Respo
         status: task.status,
         flagged: task.flagged || false,
         assignedBy: task.assignedBy?._id.toString(),
-        assignedByEmail: task.assignedByEmail || (task.assignedBy as IUser)?.email,
+        assignedByEmail:
+          task.assignedByEmail || (task.assignedBy as unknown as IUser)?.email,
         createdAt: task.createdAt.toISOString(),
         updatedAt: task.updatedAt.toISOString(),
         isAssigned: true
